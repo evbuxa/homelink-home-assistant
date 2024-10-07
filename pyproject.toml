@@ -1,0 +1,22 @@
+[project]
+name = "homelink-api"
+version = "0.0.1"
+authors = [
+  { name="Nicholas Aelick (Placeholder)", email="niaexa@syntronic.com (Placeholder)" },
+]
+description = "API to interact with Homelink cloud for Home Assistant"
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://www.homelink.com/"
+Issues = "https://www.homelink.com/support"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
