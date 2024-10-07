@@ -1,5 +1,5 @@
 [project]
-name = "homelink-api"
+name = "homelink"
 version = "0.0.1"
 authors = [
   { name="Nicholas Aelick (Placeholder)", email="niaexa@syntronic.com (Placeholder)" },
