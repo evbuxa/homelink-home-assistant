@@ -1,4 +1,4 @@
-from button import Button
+from homelink.model.button import Button
 
 
 class Device:

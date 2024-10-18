@@ -1,6 +1,8 @@
-from auth import AbstractAuth
-from model.button import Button
-from model.device import Device
+from homelink.auth import AbstractAuth
+from homelink.model.button import Button
+from homelink.model.device import Device
+import json
+import logging
 
 
 class Provider:
@@ -8,24 +10,26 @@ class Provider:
         self.host_url = host_url
 
     async def discover(self, auth_session: AbstractAuth):
-        device_data = await auth_session.request(
+        resp = await auth_session.request(
             "POST",
             self.host_url,
-            body={{"command": "DISCOVER"}},
-        ).json()
-
+            json={"command": "DISCOVER"},
+        )
+        device_data = await resp.json()
+        logging.info(device_data)
         devices = []
 
         for raw_device in device_data["data"]["devices"]:
             d = Device(raw_device["id"], raw_device["name"])
             for raw_button in raw_device["buttons"]:
                 d.buttons.append(Button(raw_button["id"], raw_button["name"], d))
+            devices.append(d)
 
         return devices
 
     async def enable(self, auth_session: AbstractAuth):
-        return await auth_session.request(
+        return auth_session.request(
             "POST",
             self.host_url,
-            body={{"command": "DISCOVER"}},
-        ).json()
+            json={"command": "ENABLE"},
+        )

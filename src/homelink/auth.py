@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientResponse
 
 
 class AbstractAuth(ABC):
@@ -27,7 +27,7 @@ class AbstractAuth(ABC):
 
         return await self.websession.request(
             method,
-            f"{self.host}/{url}",
+            url,
             **kwargs,
             headers=headers,
         )
