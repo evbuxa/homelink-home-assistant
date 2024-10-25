@@ -34,3 +34,5 @@ pip-wheel-metadata
 # GITHUB Proposed Python stuff:
 *.py[cod]
 __pycache__
+
+.DS_Store
