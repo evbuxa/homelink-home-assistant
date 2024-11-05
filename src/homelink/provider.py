@@ -1,18 +1,20 @@
-from homelink.auth import AbstractAuth
-from homelink.model.button import Button
-from homelink.model.device import Device
 import json
 import logging
 
+from homelink.auth import AbstractAuth
+from homelink.model.button import Button
+from homelink.model.device import Device
+from homelink.settings import DISCOVER_URL, STATE_URL, ENABLE_URL
+
 
 class Provider:
-    def __init__(self, host_url):
-        self.host_url = host_url
+    def __init__(self, authorized_session):
+        self.authorized_session = authorized_session
 
-    async def discover(self, auth_session: AbstractAuth):
-        resp = await auth_session.request(
+    async def discover(self):
+        resp = await self.authorized_session.request(
             "POST",
-            self.host_url,
+            DISCOVER_URL,
             json={"command": "DISCOVER"},
         )
         device_data = await resp.json()
@@ -27,9 +29,14 @@ class Provider:
 
         return devices
 
-    async def enable(self, auth_session: AbstractAuth):
-        return auth_session.request(
+    async def enable(self):
+        return await self.authorized_session.request(
             "POST",
-            self.host_url,
+            ENABLE_URL,
             json={"command": "ENABLE"},
         )
+
+    async def get_state(self):
+        resp = await self.authorized_session.request("GET", STATE_URL)
+        resp_data = await resp.json()
+        return resp_data["data"]
