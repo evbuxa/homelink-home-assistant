@@ -39,4 +39,10 @@ class Provider:
     async def get_state(self):
         resp = await self.authorized_session.request("GET", STATE_URL)
         resp_data = await resp.json()
-        return resp_data["data"]
+        if "requestSync" in resp_data["data"]:
+            should_sync = resp_data["data"]["requestSync"]
+        else:
+            should_sync = None
+        return should_sync, (
+            resp_data["data"]["state"] if "state" in resp_data["data"] else {}
+        )
