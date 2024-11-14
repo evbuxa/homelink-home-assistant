@@ -30,11 +30,12 @@ class Provider:
         return devices
 
     async def enable(self):
-        return await self.authorized_session.request(
+        enable_resp = await self.authorized_session.request(
             "POST",
             ENABLE_URL,
             json={"command": "ENABLE"},
         )
+        return await enable_resp.json()
 
     async def get_state(self):
         resp = await self.authorized_session.request("GET", STATE_URL)

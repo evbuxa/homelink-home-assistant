@@ -1,0 +1,38 @@
+{
+    "success": true,
+    "message": "Discover Response",
+    "data": {
+        "devices": [
+            {
+                "id": "d5b7a76a-57d1-490b-95f9-3f179c3b5fb2",
+                "user_id": "21bb2560-50e1-70d1-10f3-a9c188456662",
+                "name": "PhiDevice",
+                "serial_number": "0123456789",
+                "model_number": "Test Model",
+                "buttons": [
+                    {
+                        "id": "9084ba1f-5f4c-4ccf-a168-13aabefc32a4",
+                        "name": "Button 1",
+                        "exposed_to_cloud": true,
+                        "type": "homelink",
+                        "index": 1
+                    },
+                    {
+                        "id": "5a0c0c26-e890-4928-8112-2cdb22b42af6",
+                        "name": "Button 2",
+                        "exposed_to_cloud": true,
+                        "type": "homelink",
+                        "index": 2
+                    },
+                    {
+                        "id": "cc2b211c-2cf2-48e4-a414-ba44a8b6417d",
+                        "name": "Button 3",
+                        "exposed_to_cloud": true,
+                        "type": "homelink",
+                        "index": 3
+                    }
+                ]
+            }
+        ]
+    }
+}
