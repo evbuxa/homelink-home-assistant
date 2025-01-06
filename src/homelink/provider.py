@@ -1,7 +1,7 @@
 import json
 import logging
 
-from homelink.auth import AbstractAuth
+from homelink.auth.abstract_auth import AbstractAuth
 from homelink.model.button import Button
 from homelink.model.device import Device
 from homelink.settings import DISCOVER_URL, STATE_URL, ENABLE_URL

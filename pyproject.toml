@@ -12,7 +12,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-dependencies = ["python-decouple>=3.8"]
+dependencies = ["python-decouple>=3.8", "boto3"]
 
 [tool.pytest.ini_options]
 pythonpath = [
