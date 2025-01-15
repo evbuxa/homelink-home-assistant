@@ -1,7 +1,7 @@
 from decouple import config
 
 # TODO: Defaults should be production
-HOST_URL = config("HOMELINK_HOST_URL", default="https://d1f2mm2dg61j0w.cloudfront.net")
+HOST_URL = config("HOMELINK_HOST_URL", default="https://homelinkcloud.com")
 DISCOVER_URL = config(
     "HOMELINK_DISCOVER_URL",
     default=f"{HOST_URL}/services/v2/home-assistant/fulfillment",
@@ -13,5 +13,5 @@ STATE_URL = config(
     "HOMELINK_STATE_URL", default=f"{HOST_URL}/services/v2/home-assistant/state"
 )
 
-COGNITO_POOL_ID = config("COGNITO_POOL_ID", default="us-east-2_XatM5eD73")
-COGNITO_CLIENT_ID = config("COGNITO_CLIENT_ID", default="7t8ed00265b8040cmdl1j361ve")
+COGNITO_POOL_ID = config("COGNITO_POOL_ID", default="us-east-2_sBYr2OD1J")
+COGNITO_CLIENT_ID = config("COGNITO_CLIENT_ID", default="701cln3h6bgqfldh61rcf21ko0")

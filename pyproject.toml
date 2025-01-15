@@ -1,8 +1,8 @@
 [project]
-name = "homelink"
-version = "0.0.1"
+name = "homelink-home-assistant"
+version = "0.0.2"
 authors = [
-  { name="Nicholas Aelick (Placeholder)", email="niaexa@syntronic.com (Placeholder)" },
+  { name="Nicholas Aelick", email="niaexa@syntronic.com" },
 ]
 description = "API to interact with Homelink cloud for Home Assistant"
 readme = "README.md"

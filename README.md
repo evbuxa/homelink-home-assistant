@@ -1,6 +1,6 @@
 # HomeLink SmartHome Home Assistant API
 
-This project contains a python API to connect home assistant to homelink smarthome cloud
+This project contains a python API to connect home assistant to HomeLink smarthome cloud
 
 ## Setup
 

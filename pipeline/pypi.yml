@@ -1,3 +1,5 @@
+trigger:
+  - master
 jobs:
   - job: publish
     displayName: "Homelink"
@@ -7,8 +9,7 @@ jobs:
     container:
       image: python:3.13-slim
       env:
-        PIP_INDEX_URL: https://gpm.gentex.com/pypi/PyPI/simple
-        PIP_EXTRA_INDEX_URL: https://pypi.org/simple
+        PIP_INDEX_URL: https://pypi.org/simple
     steps:
       - checkout: self
         clean: true
@@ -26,8 +27,8 @@ jobs:
         displayName: Install twine
       - task: TwineAuthenticate@0
         inputs:
-          externalFeeds: proget_pypi
+          externalFeeds: pypi_upload
       - script: |
           ls '$(System.ArtifactsDirectory)/Linux'
-          python -m twine upload --disable-progress-bar -r proget_pypi --config-file $(PYPIRC_PATH) --verbose $(System.ArtifactsDirectory)/Linux/*
+          python -m twine upload --disable-progress-bar -r pypi --config-file $(PYPIRC_PATH) --verbose $(System.ArtifactsDirectory)/Linux/*
         displayName: Upload packages
