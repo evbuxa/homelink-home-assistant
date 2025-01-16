@@ -11,7 +11,7 @@ ENABLE_URL = config(
     default=f"https://{HOST_URL}/services/v2/home-assistant/fulfillment",
 )
 STATE_URL = config(
-    "HOMELINK_STATE_URL", default="https://state.{HOST_URL}/services/v2/home-assistant"
+    "HOMELINK_STATE_URL", default=f"https://state.{HOST_URL}/services/v2/home-assistant"
 )
 
 COGNITO_POOL_ID = config("COGNITO_POOL_ID", default="us-east-2_sBYr2OD1J")
