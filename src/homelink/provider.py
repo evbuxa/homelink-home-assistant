@@ -40,7 +40,7 @@ class Provider:
     async def get_state(self):
         resp = await self.authorized_session.request("GET", STATE_URL)
         resp_data = await resp.json()
-        if "data" not in resp_data:
+        if "data" not in resp_data or resp_data["data"] is None:
             return None, {}
 
         if "requestSync" in resp_data["data"]:
