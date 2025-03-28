@@ -23,8 +23,8 @@ MQTT_ROOT_CA_REPOSITORY = config(
 MQTT_PRIVATE_KEY_SIZE = config("MQTT_PRIVATE_KEY_SIZE", 2048)
 MQTT_IOT_ENDPOINT = config("MQTT_IOT_ENDPOINT", "iot.homelinkcloud.com")
 MQTT_IOT_PORT = config("MQTT_IOT_PORT", 8883)
-MQTT_IOT_PORT = config(
-    "MQTT_IOT_PORT", "homelink/certs/integration-certificate.pem.crt"
+MQTT_CERT_PATH = config(
+    "MQTT_CERT_PATH", "homelink/certs/integration-certificate.pem.crt"
 )
 MQTT_PRIVATE_KEY_PATH = config(
     "MQTT_PRIVATE_KEY_PATH", "homelink/certs/integration.private.key"
