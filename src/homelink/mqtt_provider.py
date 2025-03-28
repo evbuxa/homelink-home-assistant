@@ -1,0 +1,105 @@
+import logging
+
+from homelink.model.button import Button
+from homelink.model.device import Device
+from homelink.settings import DISCOVER_URL, ENABLE_URL, MQTT_IOT_ENDPOINT, MQTT_IOT_PORT
+
+import paho.mqtt.client as mqtt
+import homelink.mqtt_util as mqtt_util
+import ssl
+import json
+
+
+class MQTTProvider:
+    def __init__(self, authorized_session):
+        self.authorized_session = authorized_session
+        self.mqtt_client = None
+        self.listeners = []
+
+    async def discover(self):
+        resp = await self.authorized_session.request(
+            "POST",
+            DISCOVER_URL,
+            json={"command": "DISCOVER"},
+        )
+        device_data = await resp.json()
+        logging.info(device_data)
+        devices = []
+
+        for raw_device in device_data["data"]["devices"]:
+            d = Device(raw_device["id"], raw_device["name"])
+            for raw_button in raw_device["buttons"]:
+                d.buttons.append(Button(raw_button["id"], raw_button["name"], d))
+            devices.append(d)
+
+        return devices
+
+    async def enable(self):
+        pkey, csr = await mqtt_util.generate_csr()
+        pkey_file = mqtt_util.save_pkey(pkey)
+        enable_resp = await self.authorized_session.request(
+            "POST",
+            ENABLE_URL,
+            json={"command": "ENABLE", "data": {"csr": csr}},
+        )
+
+        resp_json = await enable_resp.json()
+        cert_file = mqtt_util.save_cert(resp_json["data"]["certificatePem"])
+        topic = resp_json["data"]["topic"]
+        self.mqtt_client = mqtt.Client(client_id="TODO", protocol=mqtt.MQTTv5)
+        self.mqtt_client.user_data_set({"topic": topic, "listeners": self.listeners})
+        self.mqtt_client.tls_set(
+            certfile=cert_file,
+            keyfile=pkey_file,
+            cert_reqs=ssl.CERT_REQUIRED,
+            tls_version=ssl.PROTOCOL_TLSv1_2,
+            ciphers=None,
+        )
+        self.mqtt_client.on_connect = self._on_connect
+        self.mqtt_client.on_message = self._on_message
+        self.mqtt_client.on_connect_fail = self._on_connect_fail
+        self.mqtt_client.on_disconnect = self._on_disconnect
+
+        self.mqtt_client.connect(MQTT_IOT_ENDPOINT, MQTT_IOT_PORT, keepalive=60)
+        self.mqtt_client.loop_start()
+
+        return resp_json
+
+    async def disable(self):
+        self.mqtt_client.loop_stop()
+        self.mqtt_client.disconnect()
+        enable_resp = await self.authorized_session.request(
+            "POST", ENABLE_URL, json={"command": "DISABLE"}
+        )
+        return await enable_resp.json()
+
+    def listen(self, cb):
+        self.listeners.append(cb)
+
+    def _on_connect(self, client, userdata, flags, rc, properties=None):
+        if rc == 0:
+            client.subscribe(userdata["topic"], qos=1)
+        else:
+            raise ConnectionError("Failed to connect")
+
+    def _on_message(self, client, userdata, msg):
+        res = {}
+        json_msg = json.loads(msg.payload.decode("utf-8"))
+        if "state" in json_msg:
+            res = {"type": "state", "data": json_msg["state"]}
+        elif "requestSync" in json_msg:
+            res = {"type": "requestSync", "data": json_msg["requestSync"]}
+        else:
+            raise ConnectionError("Unidentified message type recieved")
+        for listener in userdata["listeners"]:
+            listener(msg.topic, res)
+
+    def _on_connect_fail(self, client, userdata):
+        res = {"type": "connect_fail", "data": {}}
+        for listener in userdata["listeners"]:
+            listener("connect_fail", res)
+
+    def _on_disconnect(self, client, userdata, reason_code, properties):
+        res = {"type": "disconnect", "data": {"code": reason_code}}
+        for listener in userdata["listeners"]:
+            listener("disconnect", res)

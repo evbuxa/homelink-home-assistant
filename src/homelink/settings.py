@@ -16,3 +16,16 @@ STATE_URL = config(
 
 COGNITO_POOL_ID = config("COGNITO_POOL_ID", default="us-east-2_sBYr2OD1J")
 COGNITO_CLIENT_ID = config("COGNITO_CLIENT_ID", default="701cln3h6bgqfldh61rcf21ko0")
+MQTT_ROOT_CA = config("MQTT_ROOT_CA", "AmazonRootCA1.pem")
+MQTT_ROOT_CA_REPOSITORY = config(
+    "MQTT_ROOT_CA_REPOSITORY", "https://www.amazontrust.com/repository"
+)
+MQTT_PRIVATE_KEY_SIZE = config("MQTT_PRIVATE_KEY_SIZE", 2048)
+MQTT_IOT_ENDPOINT = config("MQTT_IOT_ENDPOINT", "iot.homelinkcloud.com")
+MQTT_IOT_PORT = config("MQTT_IOT_PORT", 8883)
+MQTT_IOT_PORT = config(
+    "MQTT_IOT_PORT", "homelink/certs/integration-certificate.pem.crt"
+)
+MQTT_PRIVATE_KEY_PATH = config(
+    "MQTT_PRIVATE_KEY_PATH", "homelink/certs/integration.private.key"
+)
