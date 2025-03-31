@@ -1,8 +1,6 @@
 from OpenSSL import crypto
 import re
 from homelink.settings import (
-    MQTT_PRIVATE_KEY_PATH,
-    MQTT_CERT_PATH,
     MQTT_ROOT_CA,
     MQTT_ROOT_CA_REPOSITORY,
     MQTT_PRIVATE_KEY_SIZE,
@@ -21,18 +19,6 @@ def format_csr(csr_pem):
         .strip()
         .replace("\n", "")
     )
-
-
-def save_pkey(pkey):
-    with open(MQTT_PRIVATE_KEY_PATH, "wb") as f:
-        f.write(pkey)
-    return MQTT_PRIVATE_KEY_PATH
-
-
-def save_cert(csr):
-    with open(MQTT_CERT_PATH, "w") as f:
-        f.write(csr)
-    return MQTT_CERT_PATH
 
 
 async def generate_csr():
