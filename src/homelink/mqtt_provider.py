@@ -9,6 +9,7 @@ import homelink.mqtt_util as mqtt_util
 import ssl
 import json
 import tempfile
+import os
 
 
 class MQTTProvider:
@@ -36,41 +37,44 @@ class MQTTProvider:
         return devices
 
     async def enable(self):
-        with (
-            tempfile.TemporaryFile() as pkey_file,
-            tempfile.TemporaryFile() as cert_file,
-        ):
-            pkey, csr = await mqtt_util.generate_csr()
-            pkey_file.write(pkey)
-            enable_resp = await self.authorized_session.request(
-                "POST",
-                ENABLE_URL,
-                json={"command": "ENABLE", "data": {"csr": csr}},
-            )
+        pkey, csr = await mqtt_util.generate_csr()
+        f, pk_file_path = tempfile.mkstemp()
+        with open(pk_file_path, "wb") as f:
+            f.write(pkey)
+        enable_resp = await self.authorized_session.request(
+            "POST",
+            ENABLE_URL,
+            json={"command": "ENABLE", "data": {"csr": csr}},
+        )
 
-            resp_json = await enable_resp.json()
-            cert_file.write(resp_json["data"]["certificatePem"])
-            topic = resp_json["data"]["topic"]
-            self.mqtt_client = mqtt.Client(client_id="TODO", protocol=mqtt.MQTTv5)
-            self.mqtt_client.user_data_set(
-                {"topic": topic, "listeners": self.listeners}
-            )
-            self.mqtt_client.tls_set(
-                certfile=cert_file,
-                keyfile=pkey_file,
-                cert_reqs=ssl.CERT_REQUIRED,
-                tls_version=ssl.PROTOCOL_TLSv1_2,
-                ciphers=None,
-            )
-            self.mqtt_client.on_connect = self._on_connect
-            self.mqtt_client.on_message = self._on_message
-            self.mqtt_client.on_connect_fail = self._on_connect_fail
-            self.mqtt_client.on_disconnect = self._on_disconnect
+        resp_json = await enable_resp.json()
+        f, cert_file_path = tempfile.mkstemp(text=True)
+        with open(cert_file_path, "w") as f:
+            f.write(resp_json["data"]["certificatePem"])
 
-            self.mqtt_client.connect(MQTT_IOT_ENDPOINT, MQTT_IOT_PORT, keepalive=60)
-            self.mqtt_client.loop_start()
+        print(cert_file_path, pk_file_path)
+        topic = resp_json["data"]["topic"]
+        self.mqtt_client = mqtt.Client(client_id="TODO", protocol=mqtt.MQTTv5)
+        self.mqtt_client.user_data_set({"topic": topic, "listeners": self.listeners})
+        self.mqtt_client.tls_set(
+            certfile=cert_file_path,
+            keyfile=pk_file_path,
+            cert_reqs=ssl.CERT_REQUIRED,
+            tls_version=ssl.PROTOCOL_TLSv1_2,
+            ciphers=None,
+        )
+        self.mqtt_client.on_connect = self._on_connect
+        self.mqtt_client.on_message = self._on_message
+        self.mqtt_client.on_connect_fail = self._on_connect_fail
+        self.mqtt_client.on_disconnect = self._on_disconnect
 
-            return resp_json
+        self.mqtt_client.connect(MQTT_IOT_ENDPOINT, MQTT_IOT_PORT, keepalive=60)
+        self.mqtt_client.loop_start()
+
+        os.remove(cert_file_path)
+        os.remove(pk_file_path)
+
+        return resp_json
 
     async def disable(self):
         self.mqtt_client.loop_stop()
