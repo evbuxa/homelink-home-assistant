@@ -1,5 +1,11 @@
 trigger:
-  - master
+  branches:
+    include:
+      - master
+
+# Don't run for PR's
+pr: none
+
 jobs:
   - job: publish
     displayName: "Homelink"
