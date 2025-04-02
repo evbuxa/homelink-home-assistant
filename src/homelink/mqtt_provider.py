@@ -37,7 +37,7 @@ class MQTTProvider:
 
         return devices
 
-    async def enable(self):
+    async def enable(self, sslContext=None):
         pkey, csr = await mqtt_util.generate_csr()
         _, pk_file_path = tempfile.mkstemp()
         async with aiofiles.open(pk_file_path, "wb") as f:
@@ -56,6 +56,9 @@ class MQTTProvider:
         topic = resp_json["data"]["topic"]
         self.mqtt_client = mqtt.Client(client_id="TODO", protocol=mqtt.MQTTv5)
         self.mqtt_client.user_data_set({"topic": topic, "listeners": self.listeners})
+
+        if sslContext:
+            self.mqtt_client.tls_set_context(sslContext)
         self.mqtt_client.tls_set(
             certfile=cert_file_path,
             keyfile=pk_file_path,
