@@ -10,6 +10,7 @@ import ssl
 import json
 import tempfile
 import os
+import aiofiles
 
 
 class MQTTProvider:
@@ -38,8 +39,8 @@ class MQTTProvider:
 
     async def enable(self):
         pkey, csr = await mqtt_util.generate_csr()
-        f, pk_file_path = tempfile.mkstemp()
-        with open(pk_file_path, "wb") as f:
+        _, pk_file_path = tempfile.mkstemp()
+        async with aiofiles.open(pk_file_path, "wb") as f:
             f.write(pkey)
         enable_resp = await self.authorized_session.request(
             "POST",
@@ -49,10 +50,9 @@ class MQTTProvider:
 
         resp_json = await enable_resp.json()
         f, cert_file_path = tempfile.mkstemp(text=True)
-        with open(cert_file_path, "w") as f:
+        async with aiofiles.open(cert_file_path, "w") as f:
             f.write(resp_json["data"]["certificatePem"])
 
-        print(cert_file_path, pk_file_path)
         topic = resp_json["data"]["topic"]
         self.mqtt_client = mqtt.Client(client_id="TODO", protocol=mqtt.MQTTv5)
         self.mqtt_client.user_data_set({"topic": topic, "listeners": self.listeners})
