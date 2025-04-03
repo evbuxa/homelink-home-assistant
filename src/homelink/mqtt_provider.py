@@ -11,6 +11,7 @@ import json
 import tempfile
 import os
 import aiofiles
+import asyncio
 
 
 class MQTTProvider:
@@ -38,6 +39,7 @@ class MQTTProvider:
         return devices
 
     async def enable(self, sslContext=None):
+        asyncio_loop = asyncio.get_running_loop()
         pkey, csr = await mqtt_util.generate_csr()
         _, pk_file_path = tempfile.mkstemp()
         async with aiofiles.open(pk_file_path, "wb") as f:
@@ -58,9 +60,12 @@ class MQTTProvider:
         self.mqtt_client.user_data_set({"topic": topic, "listeners": self.listeners})
 
         if sslContext:
-
-            sslContext.load_cert_chain(cert_file_path, pk_file_path, None)
-            sslContext.load_verify_locations(cert_file_path)
+            await asyncio_loop.run_in_executor(
+                None, sslContext.load_cert_chain, cert_file_path, pk_file_path, None
+            )
+            await asyncio_loop.run_in_executor(
+                None, sslContext.load_verify_locations, cert_file_path
+            )
             self.mqtt_client.tls_set_context(sslContext)
         else:
             self.mqtt_client.tls_set(
