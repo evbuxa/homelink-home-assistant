@@ -1,6 +1,6 @@
 [project]
 name = "homelink-home-assistant"
-version = "0.0.6"
+version = "0.0.7"
 authors = [
   { name="Nicholas Aelick", email="niaexa@syntronic.com" },
 ]
